@@ -97,28 +97,7 @@ class ElevatorAPI(APIView):
     }
 
     def get_elevator_serializer(self, data):
-        elevator = Elevator.objects.get(id=data['id'])
-        for key, value in data.items():
-            if not value:
-                data[key] = getattr(elevator, key)
-
         return ElevatorSerializer(data=data)
-
-    def _save_date(self, *data):
-        for datum in data:
-            elevator_serializer = self.get_elevator_serializer(datum)
-            if elevator_serializer.is_valid():
-                if Elevator.objects.get(id=datum['id']):
-                    elevator_serializer.update(
-                        instance=Elevator.objects.get(id=datum['id']),
-                        validated_data=datum
-                    )
-                else:
-                    elevator_serializer.create(validated_data=datum)
-            else:
-                return Response(elevator_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response(elevator_serializer.data, status=status.HTTP_201_CREATED)
-
 
     def get(self, request, *args, **kwargs):
         elevators = Elevator.objects.all().order_by('id')
@@ -128,7 +107,13 @@ class ElevatorAPI(APIView):
     def post(self, request, *args, **kwargs):
         num_of_elevators = request.data.get('total_elevators')
         data = [self.DATA.copy() for _ in range(num_of_elevators)]
-        return self._save_date(*data)
+        for datum in data:
+            elevator_serializer = self.get_elevator_serializer(datum)
+            if elevator_serializer.is_valid():
+                elevator_serializer.save()
+            else:
+                return Response(elevator_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data={"message": f"{num_of_elevators} elevator(s) created successfully."})
 
     def put(self, request, *args, **kwargs):
         data = self.DATA.copy()
@@ -136,7 +121,13 @@ class ElevatorAPI(APIView):
         data['current_floor'] = request.data.get("floor")
         data['current_state'] = request.data.get("state")
         data['current_direction'] = request.data.get("direction")
-        return self._save_date(data)
+        
+        elevator = Elevator.objects.get(id=request.data.get("id"))
+        elevator_serializer = ElevatorSerializer(data=data)
+        if elevator_serializer.is_valid():
+            elevator_serializer.update(instance=elevator, validated_data=data)
+            return Response(elevator_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(elevator_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class NextFloorAPI(APIView):
