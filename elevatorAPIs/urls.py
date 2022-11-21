@@ -9,6 +9,7 @@ urlpatterns = [
     path('external-request/', views.ExternalRequestAPI.as_view()),
     path('internal-request/', views.InternalRequestAPI.as_view()),
     path('elevator/', views.ElevatorAPI.as_view()),
+    path('nextfloor/<int:elevator_id>/', views.NextFloorAPI.as_view()),
 ]
 
 

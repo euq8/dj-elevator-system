@@ -127,3 +127,43 @@ class ElevatorAPI(APIView):
         data['current_direction'] = request.data.get("direction")
         return self._save_date(data)
 
+
+class NextFloorAPI(APIView):
+    permission_classes = (permissions.AllowAny,)
+    http_method_names = ['get']
+
+    def get(self, request, elevator_id):
+        next_floor = None
+        elevator = Elevator.objects.get(id=elevator_id)
+        current_state = elevator.current_state
+        if current_state == State.IDLE.value:
+            Response(
+                {"message": f"Elevator: {elevator_id} is IDLE."},
+                status=status.HTTP_201_CREATED
+            )
+        current_floor = elevator.current_floor
+        current_direction = elevator.current_direction
+        requested_floors = [
+            elevator_req.info["floor"] for elevator_req in ElevatorRequest.objects.filter(elevator_id=elevator_id)
+        ]
+        if current_direction == Direction.UP.value:
+            requested_floors = sorted(requested_floors)
+            for i in requested_floors:
+                if i > current_floor:
+                    next_floor = i
+                    break
+        else:
+            requested_floors = sorted(requested_floors, reverse=True)
+            for i in requested_floors:
+                if i < current_floor:
+                    next_floor = i
+                    break
+
+        if not next_floor:
+            # Edge-Case: if there is no floor in the moving 
+            # direction, then current floor will be next floor.
+            # Though this is not possible in real-life.
+            next_floor = current_floor
+        
+        return Response({"next_floor": next_floor}, status=status.HTTP_201_CREATED)
+
