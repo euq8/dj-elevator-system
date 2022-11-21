@@ -13,7 +13,6 @@ urlpatterns = [
     path('direction/<int:elevator_id>/', views.ElevatorDirectionAPI.as_view()),
     path('opendoor/<int:elevator_id>/', views.OpenDoorAPI.as_view()),
     path('closedoor/<int:elevator_id>/', views.CloseDoorAPI.as_view()),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 
 
