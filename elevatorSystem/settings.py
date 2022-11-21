@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'elevatorAPIs.apps.ElevatorapisConfig',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
