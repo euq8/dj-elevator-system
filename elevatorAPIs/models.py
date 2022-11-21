@@ -11,7 +11,7 @@ class Elevator(models.Model):
     id = models.AutoField(primary_key=True)
     current_floor = models.IntegerField()
     current_state = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=State.choices(),
         default=(State.IDLE.value, State.IDLE.value),
     )

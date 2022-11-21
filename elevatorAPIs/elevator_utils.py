@@ -14,6 +14,7 @@ class State(AbstractEnum):
     MOVING = "moving"
     STOPPED = "stopped"
     IDLE = "idle"
+    MAINTENANCE = "maintenance"
 
 
 class Direction(AbstractEnum):
