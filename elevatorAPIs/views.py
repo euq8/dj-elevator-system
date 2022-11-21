@@ -185,3 +185,22 @@ class ElevatorDirectionAPI(APIView):
             )
         return Response({"direction": elevator.current_direction}, status=status.HTTP_201_CREATED)
 
+
+class OpenDoorAPI(APIView):
+    permission_classes = (permissions.AllowAny,)
+    http_method_names = ['put']
+
+    def put(self, request, elevator_id):
+        elevator = Elevator.objects.get(id=elevator_id)
+        data = {
+            'current_floor': elevator.current_floor,
+            'current_state': elevator.current_state,
+            'current_direction': elevator.current_direction,
+            'is_doors_closed': False,
+        }
+        elevator_serializer = ElevatorSerializer(data=data)
+        if elevator_serializer.is_valid():
+            elevator_serializer.save()
+            return Response(elevator_serializer.data)
+        return Response(elevator_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
