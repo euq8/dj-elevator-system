@@ -58,7 +58,7 @@ class ExternalRequestAPI(APIView):
         logger.info(data)
         elevator_request_serializer = ElevatorRequestSerializer(data=data)
         if elevator_request_serializer.is_valid():
-            elevator_request_serializer.create(validated_data=data)
+            elevator_request_serializer.save()
             return Response(elevator_request_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(elevator_request_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -80,7 +80,7 @@ class InternalRequestAPI(APIView):
         }
         elevator_request_serializer = ElevatorRequestSerializer(data=data)
         if elevator_request_serializer.is_valid():
-            elevator_request_serializer.create(validated_data=data)
+            elevator_request_serializer.save()
             return Response(elevator_request_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(elevator_request_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
