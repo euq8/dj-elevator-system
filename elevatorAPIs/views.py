@@ -100,7 +100,7 @@ class ElevatorAPI(APIView):
         elevator = Elevator.objects.get(id=data['id'])
         for key, value in data.items():
             if not value:
-                data[key] = elevator[key]
+                data[key] = getattr(elevator, key)
 
         return ElevatorSerializer(data=data)
 
@@ -108,7 +108,13 @@ class ElevatorAPI(APIView):
         for datum in data:
             elevator_serializer = self.get_elevator_serializer(datum)
             if elevator_serializer.is_valid():
-                elevator_serializer.save()
+                if Elevator.objects.get(id=datum['id']):
+                    elevator_serializer.update(
+                        instance=Elevator.objects.get(id=datum['id']),
+                        validated_data=datum
+                    )
+                else:
+                    elevator_serializer.create(validated_data=datum)
             else:
                 return Response(elevator_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(elevator_serializer.data, status=status.HTTP_201_CREATED)
