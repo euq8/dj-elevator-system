@@ -167,3 +167,21 @@ class NextFloorAPI(APIView):
         
         return Response({"next_floor": next_floor}, status=status.HTTP_201_CREATED)
 
+
+class ElevatorDirectionAPI(APIView):
+    permission_classes = (permissions.AllowAny,)
+    http_method_names = ['get']
+    
+    def get(self, request, elevator_id):
+        try:
+            elevator = Elevator.objects.get(id=elevator_id)
+        except Exception as err:
+            elevator = None
+
+        if not elevator:
+            return Response(
+                {"message": f"Elevator with id {elevator_id} does not exists."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response({"direction": elevator.current_direction}, status=status.HTTP_201_CREATED)
+
