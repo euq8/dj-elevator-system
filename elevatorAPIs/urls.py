@@ -13,6 +13,7 @@ urlpatterns = [
     path('direction/<int:elevator_id>/', views.ElevatorDirectionAPI.as_view()),
     path('opendoor/<int:elevator_id>/', views.OpenDoorAPI.as_view()),
     path('closedoor/<int:elevator_id>/', views.CloseDoorAPI.as_view()),
+    path('doorhinderance/<int:elevator_id>/', views.OpenDoorAPI.as_view()),
 ]
 
 

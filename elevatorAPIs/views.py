@@ -58,7 +58,7 @@ class ExternalRequestAPI(APIView):
         logger.info(data)
         elevator_request_serializer = ElevatorRequestSerializer(data=data)
         if elevator_request_serializer.is_valid():
-            elevator_request_serializer.save()
+            elevator_request_serializer.create(validated_data=data)
             return Response(elevator_request_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(elevator_request_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -80,7 +80,7 @@ class InternalRequestAPI(APIView):
         }
         elevator_request_serializer = ElevatorRequestSerializer(data=data)
         if elevator_request_serializer.is_valid():
-            elevator_request_serializer.save()
+            elevator_request_serializer.create(validated_data=data)
             return Response(elevator_request_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(elevator_request_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -211,7 +211,7 @@ class OpenDoorAPI(APIView):
         }
         elevator_serializer = ElevatorSerializer(data=data)
         if elevator_serializer.is_valid():
-            elevator_serializer.save()
+            elevator_serializer.update(instance=elevator, validated_data=data)
             return Response(elevator_serializer.data)
         return Response(elevator_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -230,6 +230,6 @@ class CloseDoorAPI(APIView):
         }
         elevator_serializer = ElevatorSerializer(data=data)
         if elevator_serializer.is_valid():
-            elevator_serializer.save()
+            elevator_serializer.update(instance=elevator, validated_data=data)
             return Response(elevator_serializer.data)
         return Response(elevator_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
