@@ -28,7 +28,6 @@ class RequestsAPIView(APIView):
         return Response(elevator_request_serializer.data, status=status.HTTP_200_OK)
 
 
-
 class ExternalRequestAPI(APIView):
     permission_classes = (permissions.AllowAny,)
     http_method_names = ['post']
@@ -61,3 +60,24 @@ class ExternalRequestAPI(APIView):
 
         return Response(elevator_request_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class InternalRequestAPI(APIView):
+    permission_classes = (permissions.AllowAny,)
+    http_method_names = ['post']
+    
+    # create an elevator request
+    def post(self, request, *args, **kwargs):
+        data = {
+            'type': 'internal',
+            'info': {
+                'floor': request.data.get('floor') # destination floor
+            },
+            'elevator_id': request.data.get('elevator_id'),
+            'is_completed': False,
+        }
+        elevator_request_serializer = ElevatorRequestSerializer(data=data)
+        if elevator_request_serializer.is_valid():
+            elevator_request_serializer.save()
+            return Response(elevator_request_serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(elevator_request_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
