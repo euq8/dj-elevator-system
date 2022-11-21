@@ -4,10 +4,13 @@ from rest_framework.response import Response
 
 from elevatorAPIs.serializers import (
     RequestSerializer as ElevatorRequestSerializer,
+    ElevatorSerializer,
 )
 from elevatorAPIs.models import (
     Request as ElevatorRequest,
+    Elevator,
 )
+from elevatorAPIs.elevator_utils import State, Direction
 
 import logging
 # Get an instance of a logger
@@ -81,3 +84,46 @@ class InternalRequestAPI(APIView):
             return Response(elevator_request_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(elevator_request_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ElevatorAPI(APIView):
+    permission_classes = (permissions.AllowAny,)
+    http_method_names = ['get', 'post', 'put']
+    DATA = {
+        'current_floor': 0,
+        'current_state': State.IDLE.value,
+        'current_direction': Direction.UP.value,
+        'is_doors_closed': True,
+    }
+
+    def get_elevator_serializer(self, data):
+        return ElevatorSerializer(data=data)
+
+    def _save_date(self, *data):
+        for datum in data:
+            elevator_serializer = self.get_elevator_serializer(datum)
+            if elevator_serializer.is_valid():
+                elevator_serializer.save()
+            else:
+                return Response(elevator_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(elevator_serializer.data, status=status.HTTP_201_CREATED)
+
+
+    def get(self, request, *args, **kwargs):
+        elevators = Elevator.objects.all().order_by('id')
+        elevator_serializer = ElevatorSerializer(elevators, many=True)
+        return Response(elevator_serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        num_of_elevators = request.data.get('total_elevators')
+        data = [self.DATA.copy() for _ in range(num_of_elevators)]
+        return self._save_date(*data)
+
+    def put(self, request, *args, **kwargs):
+        data = self.DATA.copy()
+        data['id'] = request.data.get("id")
+        data['current_floor'] = request.data.get("floor")
+        data['current_state'] = request.data.get("state")
+        data['current_direction'] = request.data.get("direction")
+        return self._save_date(data)
+
