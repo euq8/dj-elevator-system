@@ -12,6 +12,7 @@ urlpatterns = [
     path('nextfloor/<int:elevator_id>/', views.NextFloorAPI.as_view()),
     path('direction/<int:elevator_id>/', views.ElevatorDirectionAPI.as_view()),
     path('opendoor/<int:elevator_id>/', views.OpenDoorAPI.as_view()),
+    path('closedoor/<int:elevator_id>/', views.CloseDoorAPI.as_view()),
 ]
 
 
