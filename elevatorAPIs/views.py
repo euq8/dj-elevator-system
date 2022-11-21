@@ -97,6 +97,11 @@ class ElevatorAPI(APIView):
     }
 
     def get_elevator_serializer(self, data):
+        elevator = Elevator.objects.get(id=data['id'])
+        for key, value in data.items():
+            if not value:
+                data[key] = elevator[key]
+
         return ElevatorSerializer(data=data)
 
     def _save_date(self, *data):
